@@ -1,0 +1,83 @@
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #E01A76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.main {
+  max-width: 60%;
+  margin: 0 auto
+}
+
+.form {
+  margin-top: 20px;
+}
+
+.radioMale {
+  margin-right: 15px;
+  margin-left: 15px;
+}
+
+.childrenHeader {
+  margin-top: 20px;
+}
+
+#upload_file_label {
+  cursor: pointer;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 8px 14px;
+  /* Style as you please, it will become the visible UI component. */
+}
+
+#upload_file {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.separator {
+  height: 25px;
+}
+
+/* input:invalid:not(:placeholder-shown) {border-color: red;} */
+/* input:valid:not(:placeholder-shown) {border-color: black;} */
+
+/* .error {
+  width  : 100%;
+  padding: 0;
+
+  font-size: 80%;
+  color: white;
+  background-color: #900;
+  border-radius: 0 0 5px 5px;
+
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.error.active {
+  padding: 0.3em;
+} */
+
+@media (max-width: 992px)
+{
+  .main {
+      max-width: 80%;
+  }
+}
+
+.childrenBlock {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 20px;
+}
