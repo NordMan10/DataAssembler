@@ -6,14 +6,14 @@ import {ChildForm} from "./ChildForm"
 export const PassportForm = () => {
   const [passportData, setPassportData] = useState(
     {
-      secondName: "Ten",
-      firstName: "Yury",
+      secondName: "",
+      firstName: "",
       patronymic: "Menovich",
-      series: "5241",
-      number: "152478",
+      series: "8241",
+      number: "352478",
       issuePlace: "ГУ МВД России",
-      issueDate: "2013-01-08",
-      unitNumber: "656565",
+      issueDate: "",
+      unitNumber: "",
     });
 
 
@@ -76,10 +76,10 @@ export const PassportForm = () => {
 
   const is_fields_empty = () => {
     var inputs = document.getElementsByClassName("verifiable");
-    var data = Array.from(inputs, e => e.value);
+    //var data = Array.from(inputs, e => e.value);
 
-    for (var i = 0; i < data.length; i++) {
-      if (data[i] == "") {
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value == "") {
         console.log("Hey");
         return true;
       }
@@ -113,10 +113,13 @@ export const PassportForm = () => {
 
   const axios = require('axios');
 
-  const onSubmit = e =>{
+  const onSubmit = e => {
     e.preventDefault();
+
+    validate_fields()
+
     if (is_fields_empty()) {
-      alert("Заполните все поля");
+      //alert("Заполните все поля");
     }
     else {
       axios.post('/addPassport', 
@@ -128,26 +131,23 @@ export const PassportForm = () => {
     }
   }
 
-  const getExcel = (e) => {
-    e.preventDefault();
-    if (is_fields_empty()) {
-      alert("Заполните все поля");
-    }
-    else {
-      axios.get("/download" + "/" + passportData.series + "/" + passportData.number, 
-      {
+  const validate_fields = () => {
+    var inputs = document.getElementsByClassName("verifiable");
+    var data = Array.from(inputs, e => e.value);
+
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value == "") {
+        inputs[i].placeholder = " ";
         
-      }).then(res => {
-        console.log(res)}); // Результат ответа от сервера
+      }
     }
   }
-
 
   useEffect(validate_form);
 
   return (
     <div>
-
+        {/* {validate_form} */}
         <Form className="form">
           <Row form>
             <Col>
@@ -155,7 +155,8 @@ export const PassportForm = () => {
                 <Label for="secondName">Фамилия</Label>
                 <Input className="verifiable" type="text" name="secondName" id="secondName" 
                   onChange={(e) => setPassportData({...passportData, ...{[e.target.name]: e.target.value}})} 
-                  required value={passportData.secondName} placeholder=" "/>
+                  required value={passportData.secondName} placeholder=""/>
+                  <span className="tooltip">Введите Вашу фамилию!</span>
               </FormGroup>
             </Col>
             <Col>
@@ -163,15 +164,17 @@ export const PassportForm = () => {
                 <Label for="FirstName">Имя</Label>
                 <Input className="verifiable" type="text" name="FirstName" id="firstName"
                 onChange={(e) => setPassportData({...passportData, ...{firstName: e.target.value}})}
-                 required value={passportData.firstName} placeholder=" "/>
+                 required value={passportData.firstName} placeholder=""/>
+                 <span className="tooltip">Введи Ваше имя!</span>
               </FormGroup>
             </Col>
             <Col>
               <FormGroup>
                 <Label for="patronymic">Отчество</Label>
-                <Input className="verifiable" type="text" name="patronymic" id="patronymic" 
+                <Input  type="text" name="patronymic" id="patronymic" 
                 onChange={(e) => setPassportData({...passportData, ...{patronymic: e.target.value}})}
-                 required value={passportData.patronymic} placeholder=" "/>
+                 required value={passportData.patronymic} placeholder=""/>
+                 {/* <span className="tooltip">Введите Ваше отчество</span> */}
               </FormGroup>
             </Col>
           </Row>
@@ -183,7 +186,7 @@ export const PassportForm = () => {
                 onChange={(e) => setPassportData({...passportData, ...{series: e.target.value}})}
                 required value={passportData.series} 
                 maxLength="4"/>
-                
+                <span className="tooltip">Введите серию паспорта!</span>
               </FormGroup>
             </Col>
             <Col>
@@ -193,6 +196,7 @@ export const PassportForm = () => {
                 onChange={(e) => setPassportData({...passportData, ...{number: e.target.value}})}
                 required value={passportData.number} 
                 maxLength="6"/>
+                <span className="tooltip">Введите номер паспорта!</span>
               </FormGroup>
             </Col>
           </Row>
@@ -201,6 +205,7 @@ export const PassportForm = () => {
             <Input className="verifiable" type="text" name="issuePlace" id="issuePlace" 
             onChange={(e) => setPassportData({...passportData, ...{issuePlace: e.target.value}})}
             required value={passportData.issuePlace} />
+            <span className="tooltip">Введите место выдачи!</span>
           </FormGroup>
           <Row>
             <Col>
@@ -208,7 +213,8 @@ export const PassportForm = () => {
                 <Label for="issueDate">Дата выдачи</Label>
                 <Input className="verifiable" type="date" name="issueDate" id="issueDate"
                 onChange={(e) => setPassportData({...passportData, ...{issueDate: e.target.value}})}
-                 required value={passportData.issueDate}/>
+                 required value={passportData.issueDate} />
+                 <span className="tooltip">Введи дату выдачи паспорта, пожалуйста!</span>
               </FormGroup>
             </Col>
             <Col>
@@ -216,8 +222,9 @@ export const PassportForm = () => {
                 <Label for="unitNumber">Номер подразделения</Label>
                 <Input className="verifiable" type="text" name="unitNumber" id="unitNumber" 
                 onChange={(e) => setPassportData({...passportData, ...{unitNumber: e.target.value}})}
-                 value={passportData.unitNumber} required 
-                 minLength="6" maxLength="6"/>
+                 value={passportData.unitNumber} required minLength="6"
+                 maxLength="6" placeholder=""/>
+                 <span className="tooltip">Введи номер подразделения, пожалуйста!</span>
               </FormGroup>
               
               <Input type='file' id='upload_file' 
