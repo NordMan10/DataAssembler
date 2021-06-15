@@ -27,6 +27,7 @@ export const ChildForm = (props) => {
       if (key === "childGender") {
         gender = value;
       }
+      return true;
     })
     
     if (gender === "male") {

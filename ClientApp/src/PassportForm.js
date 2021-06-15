@@ -47,7 +47,7 @@ export const PassportForm = () => {
     return Object.keys(obj).length === 0;
   }
 
-  var openFile = (event) => {
+  var openFile = () => {
     var input = document.getElementById("upload_file");
 
     var reader = new FileReader();
@@ -56,7 +56,7 @@ export const PassportForm = () => {
       var jsonObj = JSON.parse(text);
       setPassportData(jsonObj.passport);
       if (!isObjectEmpty(jsonObj.children)) {
-        for (const [key, value] of Object.entries(jsonObj.children)) {
+        for (const value of Object.values(jsonObj.children)) {
           setChildData((prevData) => {
             return [
               ...prevData,
@@ -65,7 +65,6 @@ export const PassportForm = () => {
           })
         }
       }
-      console.log(reader.result.substring(0, 200));
     };
     reader.readAsText(input.files[0]);
   };
@@ -79,8 +78,8 @@ export const PassportForm = () => {
     //var data = Array.from(inputs, e => e.value);
 
     for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].value == "") {
-        console.log("Hey");
+      if (inputs[i].value === "") {
+        //console.log("Hey");
         return true;
       }
     }
@@ -127,16 +126,16 @@ export const PassportForm = () => {
         passport: {...passportData},
         children: {...childData}
       }).then(res => {
-        console.log(res)}); // Результат ответа от сервера
+        //console.log(res)
+      }); // Результат ответа от сервера
     }
   }
 
   const validate_fields = () => {
     var inputs = document.getElementsByClassName("verifiable");
-    var data = Array.from(inputs, e => e.value);
 
     for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].value == "") {
+      if (inputs[i].value === "") {
         inputs[i].placeholder = " ";
         
       }
@@ -228,14 +227,14 @@ export const PassportForm = () => {
               </FormGroup>
               
               <Input type='file' id='upload_file' 
-              onChange={ (e) => {
-                openFile(e)
+              onChange={ () => {
+                openFile()
               }}/>
             </Col>
           </Row>
           <Button type="submit" color="primary" onClick={onSubmit}>Отправить</Button>
           <Button type="button" color="primary" 
-          href={"/download" + "/" + passportData.series + "/" +
+          href={"/download/" + passportData.series + "/" +
            passportData.number}>Экспорт в Excel</Button>
           </Form>
           
