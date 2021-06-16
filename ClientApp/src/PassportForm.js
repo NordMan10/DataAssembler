@@ -8,32 +8,23 @@ export const PassportForm = () => {
     {
       secondName: "",
       firstName: "",
-      patronymic: "Menovich",
-      series: "8241",
-      number: "352478",
-      issuePlace: "ГУ МВД России",
+      patronymic: "",
+      series: "",
+      number: "",
+      issuePlace: "",
       issueDate: "",
       unitNumber: "",
     });
 
-
-  const [childData, setChildData] = useState([]);
-
-  const addChildData = (e, data) => {
-    e.preventDefault();
-    setChildData(prevData => {
-      return [
-        ...prevData,
-        data[0]
-      ]
-    })
-    
+  const childDataItem = 
+  {
+    childSecondName: "",
+    childFirstName: "",
+    childPatronymic: "",
+    childBirthDate: "",
   }
 
-  // const [childBlocks, setChildBlocks] = useState([
-  //   <ChildForm id={childBlockCount} getChildData={getChildData}/>
-  // ]);
-
+  const [childrenData, setChildrenData] = useState([]);
 
   const saveData = (content, fileName, contentType) => {
     var a = document.createElement("a");
@@ -43,21 +34,19 @@ export const PassportForm = () => {
     a.click();
   }
 
-  const isObjectEmpty = (obj) => {
-    return Object.keys(obj).length === 0;
-  }
-
   var openFile = () => {
     var input = document.getElementById("upload_file");
-
+    
     var reader = new FileReader();
+    reader.readAsText(input.files[0]);
+
     reader.onload = function() {
       var text = reader.result;
       var jsonObj = JSON.parse(text);
       setPassportData(jsonObj.passport);
       if (!isObjectEmpty(jsonObj.children)) {
         for (const value of Object.values(jsonObj.children)) {
-          setChildData((prevData) => {
+          setChildrenData((prevData) => {
             return [
               ...prevData,
               value
@@ -66,27 +55,50 @@ export const PassportForm = () => {
         }
       }
     };
-    reader.readAsText(input.files[0]);
+    //#region 
+    // var reader = new FileReader();
+    // reader.readAsBinaryString(input.files[0]);
+    // var file = JSON.parse(reader.result);
+    // setPassportData(file.passport);
+    
+    // if (!isObjectEmpty(file.children)) {
+    //   for (const value of Object.values(file.children)) {
+    //     setChildData((prevData) => {
+    //       return [
+    //         ...prevData,
+    //         value
+    //       ]
+    //     })
+    //   }
+    // }
+
+    //#endregion
   };
+
+  const isObjectEmpty = (obj) => {
+    return Object.keys(obj).length === 0;
+  }
 
   const click = () => {
     document.getElementById("upload_file_label").click();
   }
 
-  const is_fields_empty = () => {
-    var inputs = document.getElementsByClassName("verifiable");
-    //var data = Array.from(inputs, e => e.value);
+  //#region 
+  // const is_fields_empty = () => {
+  //   var inputs = document.getElementsByClassName("required");
+  //   //var data = Array.from(inputs, e => e.value);
 
-    for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].value === "") {
-        //console.log("Hey");
-        return true;
-      }
-    }
-    return false;
-  }
+  //   for (var i = 0; i < inputs.length; i++) {
+  //     if (inputs[i].value === "") {
+  //       //console.log("Hey");
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+  //#endregion
 
-  const validate_form = () => {
+  const check_fields = () => {
     document.querySelector('#secondName').addEventListener('keyup', function(){
       this.value = this.value.replace(/[^A-zА-я]/g, '');
     });
@@ -110,61 +122,59 @@ export const PassportForm = () => {
     });
   }
 
+  const check_empty_fields = () => {
+    var inputs = document.getElementsByClassName("required");
+    var is_empty = false;
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].value === "") {
+        inputs[i].placeholder = " ";
+        console.log(inputs[i].name)
+        is_empty = true;
+      }
+    }
+    if (is_empty) return true;
+    else return false;
+  }
+
+  useEffect(check_fields);
+
+
   const axios = require('axios');
 
   const onSubmit = e => {
     e.preventDefault();
 
-    validate_fields()
-
-    if (is_fields_empty()) {
-      //alert("Заполните все поля");
-    }
-    else {
+    if (!check_empty_fields()) {
       axios.post('/addPassport', 
       {
         passport: {...passportData},
-        children: {...childData}
+        children: {...childrenData}
       }).then(res => {
-        //console.log(res)
-      }); // Результат ответа от сервера
+        console.log(res);
+      }); 
     }
   }
-
-  const validate_fields = () => {
-    var inputs = document.getElementsByClassName("verifiable");
-
-    for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].value === "") {
-        inputs[i].placeholder = " ";
-        
-      }
-    }
-  }
-
-  useEffect(validate_form);
 
   return (
     <div>
-        {/* {validate_form} */}
-        <Form className="form">
-          <Row form>
+        <Form>
+          <Row>
             <Col>
               <FormGroup>
                 <Label for="secondName">Фамилия</Label>
-                <Input className="verifiable" type="text" name="secondName" id="secondName" 
+                <Input className="required" type="text" name="secondName" id="secondName" 
                   onChange={(e) => setPassportData({...passportData, ...{[e.target.name]: e.target.value}})} 
                   required value={passportData.secondName} placeholder=""/>
-                  <span className="tooltip">Введите Вашу фамилию!</span>
+                  <span className="tooltip">Введите фамилию!</span>
               </FormGroup>
             </Col>
             <Col>
               <FormGroup>
                 <Label for="FirstName">Имя</Label>
-                <Input className="verifiable" type="text" name="FirstName" id="firstName"
+                <Input className="required" type="text" name="FirstName" id="firstName"
                 onChange={(e) => setPassportData({...passportData, ...{firstName: e.target.value}})}
                  required value={passportData.firstName} placeholder=""/>
-                 <span className="tooltip">Введи Ваше имя!</span>
+                 <span className="tooltip">Введите имя!</span>
               </FormGroup>
             </Col>
             <Col>
@@ -181,7 +191,7 @@ export const PassportForm = () => {
             <Col>
               <FormGroup>
                 <Label for="series">Серия</Label>
-                <Input className="verifiable" type="text" name="series" id="series" 
+                <Input className="required" type="text" name="series" id="series" 
                 onChange={(e) => setPassportData({...passportData, ...{series: e.target.value}})}
                 required value={passportData.series} 
                 maxLength="4"/>
@@ -191,7 +201,7 @@ export const PassportForm = () => {
             <Col>
               <FormGroup>
                 <Label for="number">Номер</Label>
-                <Input className="verifiable" type="text" name="number" id="number" 
+                <Input className="required" type="text" name="number" id="number" 
                 onChange={(e) => setPassportData({...passportData, ...{number: e.target.value}})}
                 required value={passportData.number} 
                 maxLength="6"/>
@@ -201,16 +211,16 @@ export const PassportForm = () => {
           </Row>
           <FormGroup>
             <Label for="issuePlace">Кем выдан</Label>
-            <Input className="verifiable" type="text" name="issuePlace" id="issuePlace" 
+            <Input className="required" type="text" name="issuePlace" id="issuePlace" 
             onChange={(e) => setPassportData({...passportData, ...{issuePlace: e.target.value}})}
-            required value={passportData.issuePlace} />
+            required value={passportData.issuePlace} placeholder="" />
             <span className="tooltip">Введите место выдачи!</span>
           </FormGroup>
           <Row>
             <Col>
               <FormGroup>
                 <Label for="issueDate">Дата выдачи</Label>
-                <Input className="verifiable" type="date" name="issueDate" id="issueDate"
+                <Input className="required" type="date" name="issueDate" id="issueDate"
                 onChange={(e) => setPassportData({...passportData, ...{issueDate: e.target.value}})}
                  required value={passportData.issueDate} />
                  <span className="tooltip">Введи дату выдачи паспорта, пожалуйста!</span>
@@ -219,7 +229,7 @@ export const PassportForm = () => {
             <Col>
               <FormGroup>
                 <Label for="unitNumber">Номер подразделения</Label>
-                <Input className="verifiable" type="text" name="unitNumber" id="unitNumber" 
+                <Input className="required" type="text" name="unitNumber" id="unitNumber" 
                 onChange={(e) => setPassportData({...passportData, ...{unitNumber: e.target.value}})}
                  value={passportData.unitNumber} required minLength="6"
                  maxLength="6" placeholder=""/>
@@ -239,45 +249,42 @@ export const PassportForm = () => {
           </Form>
           
           <h5 className="childrenHeader">Дети:</h5>
-          {childData.map((item, i) => (
-            <ChildForm key={i} dataItem={item} onChange={item => setChildData(items => {
+          {childrenData.map((item, i) => (
+            <ChildForm key={i} id={i} dataItem={item} onChange={item => setChildrenData(items => {
               items.splice(i, 1, {...item});
               return [
                 ...items
               ]
-            })} getChildData={addChildData}/>
+            })}/>
           ))}
           
-          <Button outline type="button" color="primary" onClick={() => setChildData(prevBlocks => {
+          <Button outline type="button" color="primary" onClick={() => setChildrenData(prevBlocks => {
             return [
               ...prevBlocks,
-              {
-                childSecondName: "",
-                childFirstName: "",
-                childPatronymic: "",
-                childBirthDate: "",
-              }
+              childDataItem
             ]
           })}>Добавить ребенка</Button>
-          <Button outline type="button" color="primary" onClick={() => setChildData(prevBlocks => {
+          <Button outline type="button" color="primary" onClick={() => setChildrenData(prevBlocks => {
             var blocks = [...prevBlocks];
             blocks.splice(-1, 1);
             return blocks;
           })}>Удалить ребенка</Button><br></br>
           <div className="separator"></div>
           
-          <Button type="button" color="primary" onClick={() => {
-            var jsonData = 
-            {
-              passport: {...passportData},
-              children: {...childData}
-            }
-            saveData(JSON.stringify(jsonData), 'json.txt', 'text/plain')
-          }}>Сохранить данные</Button>
-          <Button type="button" color="primary" 
-          onClick={click}
-          >Загрузить данные</Button>
-          <Label id="upload_file_label" for="upload_file" hidden>Загрузить данные</Label>
+          <div className="save_and_upload_buttons">
+            <Button type="button" color="primary" onClick={() => {
+              var jsonData = 
+              {
+                passport: {...passportData},
+                children: {...childrenData}
+              }
+              saveData(JSON.stringify(jsonData), 'passport.txt', 'text/plain')
+            }}>Сохранить данные</Button>
+            <Button type="button" color="primary"
+            onClick={click}
+            >Загрузить данные</Button>
+            <Label id="upload_file_label" for="upload_file" hidden>Загрузить данные</Label>
+          </div>
     </div>
   )
 }

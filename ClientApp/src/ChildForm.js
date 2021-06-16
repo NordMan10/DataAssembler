@@ -7,7 +7,7 @@ export const ChildForm = (props) => {
     props.onChange({...props.dataItem, ...{[e.target.name]: e.target.value }})
   }
 
-  const validate_form = () => {
+  const check_fields = () => {
     document.querySelector('#childSecondName').addEventListener('keyup', function(){
       this.value = this.value.replace(/[^A-zА-я]/g, '');
     });
@@ -19,57 +19,61 @@ export const ChildForm = (props) => {
     });
   }
 
-  useEffect(() => {
-    var entries = Object.entries(props.dataItem);
-    var gender = "";
+  useEffect(check_fields);
 
-    entries.map(([key, value]) => {
-      if (key === "childGender") {
-        gender = value;
-      }
-      return true;
-    })
+  //#region 
+  // const gender_click = () => {
+  //   var entries = Object.entries(props.dataItem);
+  //   var gender = "";
+
+  //   entries.map(([key, value]) => {
+  //     if (key === "childGender" + props.id) {
+  //       gender = value;
+  //     }
+  //     return true;
+  //   })
     
-    if (gender === "male") {
-      document.getElementById("maleGender").setAttribute("checked", "checked");
-      document.getElementById("femaleGender").removeAttribute("checked");
-    }
-    else if (gender === "female") {
-      document.getElementById("femaleGender").setAttribute("checked", "checked");
-      document.getElementById("maleGender").removeAttribute("checked");
-    }
-  })
-
-  useEffect(validate_form);
+  //   if (gender === "male") {
+  //     document.getElementById("maleGender").setAttribute("checked", "checked");
+  //     document.getElementById("femaleGender").removeAttribute("checked");
+  //   }
+  //   else if (gender === "female") {
+  //     document.getElementById("femaleGender").setAttribute("checked", "checked");
+  //     document.getElementById("maleGender").removeAttribute("checked");
+  //   }
+  // }
+  //#endregion
+  
 
   return (
     <div>
-      <Form id="child_form">
+      <Form>
         <FormGroup className={"childrenBlock"}>
             <Row>
               <Col>
                 <FormGroup>
                   <Label for="childSecondName">Фамилия</Label>
-                  <Input  type="text" name="childSecondName" id="childSecondName"
+                  <Input className="required" type="text" name="childSecondName" id="childSecondName"
                   onChange={(e) => handleInputOnChange(e)}
                   required value={props.dataItem.childSecondName} />
+                  <span className="tooltip">Введите фамилию ребенка!</span>
                 </FormGroup>
               </Col>
               <Col>
                 <FormGroup>
                   <Label for="childFirstName">Имя</Label>
-                  <Input className="verifiable" type="text" name="childFirstName" id="childFirstName" 
+                  <Input className="required" type="text" name="childFirstName" id="childFirstName" 
                   onChange={(e) => handleInputOnChange(e)}
                   required value={props.dataItem.childFirstName}/>
+                  <span className="tooltip">Введите имя ребенка!</span>
                 </FormGroup>
               </Col>
               <Col>
                 <FormGroup>
                   <Label for="childPatronymic">Отчество</Label>
-                  <Input className="verifiable" type="text" name="childPatronymic" id="childPatronymic" 
+                  <Input className="required" type="text" name="childPatronymic" id="childPatronymic" 
                   onChange={(e) => handleInputOnChange(e)}
                   required value={props.dataItem.childPatronymic}/>
-
                 </FormGroup>
               </Col>
             </Row>
@@ -79,16 +83,17 @@ export const ChildForm = (props) => {
             <FormGroup row>
               <FormGroup check className="radioMale">
                 <Label check>
-                  <Input className="verifiable" type="radio" id={"maleGender"} name={"childGender"}
-                  onChange={(e) =>  handleInputOnChange(e)}
+                  <Input className="required" type="radio" id={"maleGender"} name={"childGender"}
+                  onChange={(e) =>  handleInputOnChange(e)} 
                   value="male" />
+                  <span className="tooltip">Укажите пол ребенка!</span>
                   Мужской
                 </Label>
               </FormGroup>
               <FormGroup check>
                 <Label check>
-                  <Input className="verifiable" type="radio" id={"femaleGender"} name={"childGender"}
-                  onChange={(e) =>  handleInputOnChange(e)}
+                  <Input className="required" type="radio" id={"femaleGender"} name={"childGender"}
+                  onChange={(e) =>  handleInputOnChange(e)} 
                   value="female"  />
                   Женский
                 </Label>
@@ -98,24 +103,22 @@ export const ChildForm = (props) => {
               <Col>
                 <FormGroup>
                   <Label for="childBirthDate">Дата рождения</Label>
-                  <Input className="verifiable" type="date" name="childBirthDate" id="childBirthDate" required 
+                  <Input className="required" type="date" name="childBirthDate" id="childBirthDate" required 
                   onChange={(e) =>  handleInputOnChange(e)} value={props.dataItem.childBirthDate}
-                  placeholder=" "/>
+                  />
+                  <span className="tooltip">Введите дату рождения ребенка!</span>
                 </FormGroup>
-                <ul>
+                {/* <ul>
                   { 
                     Object.values(props.dataItem).map((value, i) => {
                         return <li key={i}>{value}</li>
                       })
-                    
-                    
                   }
-                </ul>
+                </ul> */}
               </Col>
             </Row>
           </FormGroup>
       </Form>
     </div>   
   )
-
 }
