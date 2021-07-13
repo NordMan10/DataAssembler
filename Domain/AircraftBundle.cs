@@ -103,16 +103,16 @@ namespace OptimalMotion2.Domain
             return differenceInterval;
         }
 
-        public Dictionary<IAircraftId, IMoment> GetNominalEngineStartMoments()
+        public Dictionary<IAircraftId, IMoment> GetNominalEngineStartMoments(IAircraftBundle takingOffBundle)
         {
             var orderedTakingOffAircrafts = GetAircrafts().OrderBy(a => a.OrderMoment.Value).ToList();
             var nominalEngineStartMoments = new Dictionary<IAircraftId, IMoment>();
 
-            
             for (var i = 0; i < orderedTakingOffAircrafts.Count; i++)
             {
                 var takingOffAircraft = (TakingOffAircraft)orderedTakingOffAircrafts[i];
-                nominalEngineStartMoments.Add(takingOffAircraft.Id, new Moment(takingOffAircraft.OrderMoment.Value));
+                takingOffAircraft.SetAircraftMoments(i, takingOffBundle);
+                nominalEngineStartMoments.Add(takingOffAircraft.Id, new Moment(takingOffAircraft.Moments.EngineStart.Value));
             }
 
             return nominalEngineStartMoments;

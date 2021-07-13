@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OptimalMotion2.Domain.Interfaces;
+using OptimalMotion2.Domain.Static;
 using OptimalMotion2.Enums;
 
 namespace OptimalMotion2.Domain
@@ -74,7 +75,7 @@ namespace OptimalMotion2.Domain
                 else if (departureBundle.LastMoment.Value <= orderedLandingBundles[i].LastMoment.Value &&
                          departureBundle.FirstMoment.Value >= orderedLandingBundles[i].FirstMoment.Value)
                 {
-                    intersectionCase = IntersectionCases.Middle;
+                    intersectionCase = IntersectionCases.Inside;
                     intersectedBundle = orderedLandingBundles[i];
                     break;
                 }
@@ -93,19 +94,19 @@ namespace OptimalMotion2.Domain
             return intersectedBundle;
         }
 
-        private bool CheckRightIntersection(IAircraftBundle takingOffBundle, IAircraftBundle savedBundle)
+        private bool CheckRightIntersection(IAircraftBundle takingOffBundle, IAircraftBundle landingBundle)
         {
-            return takingOffBundle.LastMoment.Value >= savedBundle.FirstMoment.Value &&
-                   takingOffBundle.LastMoment.Value <= savedBundle.LastMoment.Value &&
-                   takingOffBundle.FirstMoment.Value < savedBundle.FirstMoment.Value;
+            return takingOffBundle.LastMoment.Value + AircraftMotionParameters.TakingOffInterval >= landingBundle.FirstMoment.Value &&
+                   takingOffBundle.LastMoment.Value + AircraftMotionParameters.TakingOffInterval <= landingBundle.LastMoment.Value &&
+                   takingOffBundle.FirstMoment.Value < landingBundle.FirstMoment.Value + AircraftMotionParameters.LandingInterval;
 
         }
 
-        private bool CheckLeftIntersection(IAircraftBundle takingOffBundle, IAircraftBundle savedBundle)
+        private bool CheckLeftIntersection(IAircraftBundle takingOffBundle, IAircraftBundle landingBundle)
         {
-            return takingOffBundle.LastMoment.Value > savedBundle.LastMoment.Value &&
-                   takingOffBundle.FirstMoment.Value >= savedBundle.FirstMoment.Value &&
-                   takingOffBundle.FirstMoment.Value <= savedBundle.LastMoment.Value;
+            return takingOffBundle.LastMoment.Value + AircraftMotionParameters.TakingOffInterval > landingBundle.LastMoment.Value &&
+                   takingOffBundle.FirstMoment.Value >= landingBundle.FirstMoment.Value + AircraftMotionParameters.LandingInterval &&
+                   takingOffBundle.FirstMoment.Value <= landingBundle.LastMoment.Value + AircraftMotionParameters.LandingInterval;
         }
 
         public List<Tuple<IAircraftBundle, IntersectionCases, int>> CheckIntersections(IAircraftBundle departureBundle)

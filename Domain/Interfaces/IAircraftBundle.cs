@@ -21,6 +21,6 @@ namespace OptimalMotion2.Domain.Interfaces
         /// </summary>
         /// <returns></returns>
         IInterval GetLastAircraftDelay();
-        Dictionary<IAircraftId, IMoment> GetNominalEngineStartMoments();
+        Dictionary<IAircraftId, IMoment> GetNominalEngineStartMoments(IAircraftBundle takingOffBundle);
     }
 }

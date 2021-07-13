@@ -29,6 +29,7 @@ namespace OptimalMotion2.Domain
         private Pen defaultPen = new Pen(Color.Black, 3f);
         private Pen landingPen = new Pen(Color.Black, 3f);
         private Pen takingOffPen = new Pen(Color.FromArgb(255, 36, 215, 42), 3f);
+        private readonly Font defaultFont = new Font("Roboto", 11f);
 
         private void GraphicBase_Paint(object sender, PaintEventArgs e)
         {
@@ -61,17 +62,15 @@ namespace OptimalMotion2.Domain
             e.Graphics.FillPolygon(pen.Brush, trianglePoints.ToArray());
         }
 
-        private void DrawCaption(PaintEventArgs e, Pen pen, Point point, string text)
+        private void DrawCaption(PaintEventArgs e, Pen pen, Font font, Point point, string text)
         {
-            var font = new Font("Roboto", 10f);
-
             e.Graphics.DrawString(text, font, pen.Brush, new PointF(point.X - 5, point.Y + 5));
         }
 
         private void DrawTimeLineCaptions(PaintEventArgs e, Pen pen, Point startPoint, Point endPoint)
         {
-            DrawCaption(e, pen, new Point(startPoint.X, startPoint.Y + 20), "0");
-            DrawCaption(e, pen, new Point(endPoint.X - 8, endPoint.Y + 20), 
+            DrawCaption(e, pen, defaultFont, new Point(startPoint.X, startPoint.Y + 20), "0");
+            DrawCaption(e, pen, defaultFont, new Point(endPoint.X - 8, endPoint.Y + 20), 
                 (ModellingParameters.ModellingTime / 60).ToString());
         }
 
@@ -84,7 +83,7 @@ namespace OptimalMotion2.Domain
                 {
                     YLineCoordinate = 100;
                     var pen = new Pen(Color.Gray, 3);
-                    DrawChart(pen, e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment,
+                    DrawChart(pen, GetTakingOffCaptionFont(), e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment,
                         data[i].AircraftId.Id.ToString());
                 }
                 else if (data[i].Type == AircraftType.TakingOff)
@@ -93,20 +92,20 @@ namespace OptimalMotion2.Domain
                     var pen = takingOffPen; // ??
                     if (data[i].SubType == ChartMomentDataType.Conflict) 
                         pen = new Pen(Color.Red, 3); // ??
-                    DrawChart(pen, e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment, 
+                    DrawChart(pen, GetTakingOffCaptionFont(), e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment, 
                         data[i].AircraftId.Id.ToString());
                 }
                 else
                 {
                     YLineCoordinate = 500;
                     var pen = landingPen;
-                    DrawChart(pen, e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment,
+                    DrawChart(pen, defaultFont, e, XLineStartCoordinate, YLineCoordinate, lineHeight, data[i].Moment,
                         Convertation.GetMinutesFromSeconds(data[i].Moment.Value).ToString());
                 }
             }
         }
 
-        private void DrawChart(Pen pen, PaintEventArgs e, int xLineStartCoordinate, 
+        private void DrawChart(Pen pen, Font font, PaintEventArgs e, int xLineStartCoordinate, 
             int yLineCoordinate, int lineHeight, IMoment moment, string captionText)
         {
             DrawTimeLine(defaultPen, e, xLineStartCoordinate, yLineCoordinate);
@@ -117,7 +116,13 @@ namespace OptimalMotion2.Domain
                 yLineCoordinate - lineHeight);
             e.Graphics.DrawLine(pen, startPoint, endPoint);
 
-            DrawCaption(e, pen, new Point(startPoint.X - 5, startPoint.Y), captionText);
+
+            DrawCaption(e, pen, font, new Point(startPoint.X - 5, startPoint.Y), captionText);
+        }
+
+        private Font GetTakingOffCaptionFont()
+        {
+            return new Font("Roboto", 11f, FontStyle.Italic);
         }
 
         /// <summary>

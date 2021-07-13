@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using OptimalMotion2.Domain.Interfaces;
 using OptimalMotion2.Domain.Static;
 using OptimalMotion2.Enums;
@@ -116,15 +117,8 @@ namespace OptimalMotion2.Domain
             var nominalEngineStartMoment = nominalEngineStartMoments.
                     Where(m => m.Key.Id == takingOffAircraft.Id.Id).First().Value;
 
-            var takingOffMomentForTable = string.Format("{0}({1})", takingOffAircraft.OrderMoment.Value.ToString(),
-                Convertation.GetMinutesFromSeconds(takingOffAircraft.OrderMoment.Value).ToString());
-            var nominalEngineStartMomentForTable = string.Format("{0}({1})", nominalEngineStartMoment.Value.ToString(),
-                Convertation.GetMinutesFromSeconds(nominalEngineStartMoment.Value).ToString());
-            var engineStartMomentForTable = string.Format("{0}({1})", takingOffAircraft.Moments.EngineStart.Value.ToString(),
-                Convertation.GetMinutesFromSeconds(takingOffAircraft.Moments.EngineStart.Value).ToString());
-
-            var tableData = new TableRowData(takingOffAircraft.Id.Id.ToString(),
-                takingOffMomentForTable, nominalEngineStartMomentForTable, engineStartMomentForTable,
+            var tableData = new TableRowData(takingOffAircraft.Id.Id.ToString(), takingOffAircraft.OrderMoment.Value.ToString(),
+                nominalEngineStartMoment.Value.ToString(), takingOffAircraft.Moments.EngineStart.Value.ToString(),
                 takingOffAircraft.ProcessingIsNeeded);
 
             table.AddRow(tableData);
@@ -239,42 +233,33 @@ namespace OptimalMotion2.Domain
                         orderedLandingBundles, intersectedBundleIndex, intersectionCase);
                     SaveOutdatedBundle(takingOffBundle, runway, specPlatform);
                     foreach (var window in emptyWindows)
-                        SpreadOuterAircraftsInWindow(window, outerAircrafts);
+                        SpreadOuterAircraftsInWindow(window, outerAircrafts, runway, specPlatform);
                     break;
                 case IntersectionCases.Left:
                     emptyWindows = bundleConflictResolver.GetEmptyWindowsForLeftCase(intersectedBundle, takingOffBundle,
                         orderedLandingBundles, intersectedBundleIndex, intersectionCase);
                     SaveOutdatedBundle(takingOffBundle, runway, specPlatform);
                     foreach (var window in emptyWindows)
-                        SpreadOuterAircraftsInWindow(window, outerAircrafts);
+                        SpreadOuterAircraftsInWindow(window, outerAircrafts, runway, specPlatform);
                     break;
-                case IntersectionCases.Inside:
+                case IntersectionCases.Middle:
                     emptyWindows = bundleConflictResolver.GetEmptyWindowsForOtherCases(intersectedBundle, orderedLandingBundles, 
                         intersectedBundleIndex, intersectionCase);
                     SaveOutdatedBundle(takingOffBundle, runway, specPlatform);
                     foreach (var window in emptyWindows)
-                        SpreadOuterAircraftsInWindow(window, outerAircrafts);
+                        SpreadOuterAircraftsInWindow(window, outerAircrafts, runway, specPlatform);
                     break;
                 case IntersectionCases.RightAndLeft:
-                    // В данном случае intersectedBundle — это левая пересеченная пачка
                     var thisIntersectedBundles = new List<IAircraftBundle> { intersectedBundle, 
                         orderedLandingBundles[intersectedBundleIndex + 1] };
                     var thisOuterAircrafts = GetOuterAircrafts(thisIntersectedBundles, takingOffBundle);
 
                     emptyWindows = bundleConflictResolver.GetEmptyWindowsForOtherCases(intersectedBundle, orderedLandingBundles, 
                         intersectedBundleIndex, intersectionCase);
-
-                    SaveOutdatedBundle(takingOffBundle, runway, specPlatform);
-                    foreach (var window in emptyWindows)
-                        SpreadOuterAircraftsInWindow(window, thisOuterAircrafts);
                     break;
                 case IntersectionCases.Out:
                     emptyWindows = bundleConflictResolver.GetEmptyWindowsForOtherCases(intersectedBundle, orderedLandingBundles, 
                         intersectedBundleIndex, intersectionCase);
-
-                    SaveOutdatedBundle(takingOffBundle, runway, specPlatform);
-                    foreach (var window in emptyWindows)
-                        SpreadOuterAircraftsInWindow(window, outerAircrafts);
                     break;
                 default:
                     outerAircrafts.Clear();
@@ -296,9 +281,8 @@ namespace OptimalMotion2.Domain
             {
                 foreach (var intersectedBundle in intersectedBundles)
                 {
-                    var bundleInterval = new Interval(new Moment(intersectedBundle.FirstMoment.Value - 
-                        AircraftMotionParameters.TakingOffInterval),
-                        new Moment(intersectedBundle.LastMoment.Value + AircraftMotionParameters.LandingInterval));
+                    var bundleInterval = new Interval(new Moment(intersectedBundle.FirstMoment.Value),
+                        new Moment(intersectedBundle.LastMoment.Value));
                     if (bundleInterval.IsMomentInInterval(takingOffAircrafts[i].OrderMoment))
                     {
                         outerAircrafts.Add(takingOffAircrafts[i]);
@@ -317,12 +301,14 @@ namespace OptimalMotion2.Domain
         /// <param name="runway"></param>
         /// <param name="specPlatform"></param>
         /// <returns></returns>
-        private List<IAircraft> SpreadOuterAircraftsInWindow(IInterval window, List<IAircraft> outerAircrafts)
+        private List<IAircraft> SpreadOuterAircraftsInWindow(IInterval window, List<IAircraft> outerAircrafts, 
+            IRunway runway, ISpecPlatform specPlatform)
         {
             var aircraftCounter = 0;
             var newTakingOffMoment = new Moment(window.FirstMoment.Value);
             while (window.LastMoment.Value >= newTakingOffMoment.Value && outerAircrafts.Count > 0)
             {
+                
                 outerAircrafts[0].OrderMoment = newTakingOffMoment;
                 outerAircrafts.RemoveAt(0);
 

@@ -18,13 +18,13 @@ namespace OptimalMotion2.Domain
             if (bundleIndex == 0)
             {
                 return GetEmptyWindow(new Moment(0),
-                    new Moment(bundle.FirstMoment.Value - AircraftMotionParameters.IntervalBetweenTakingOff));
+                    new Moment(bundle.FirstMoment.Value - AircraftMotionParameters.TakingOffInterval));
             }
             else if (bundleIndex > 0)
             {
                 var leftBundle = orderedBundles[bundleIndex - 1];
-                return GetEmptyWindow(new Moment(leftBundle.LastMoment.Value + AircraftMotionParameters.IntervalBetweenTakingOff),
-                    new Moment(bundle.FirstMoment.Value - AircraftMotionParameters.IntervalBetweenTakingOff));
+                return GetEmptyWindow(new Moment(leftBundle.LastMoment.Value + AircraftMotionParameters.LandingInterval),
+                    new Moment(bundle.FirstMoment.Value - AircraftMotionParameters.TakingOffInterval));
             }
 
             return new Interval(new Moment(0), new Moment(0));
@@ -34,31 +34,33 @@ namespace OptimalMotion2.Domain
         {
             if (orderedLandingBundles.Count <= bundleIndex + 1)
             {
-                return GetEmptyWindow(new Moment(bundle.LastMoment.Value + AircraftMotionParameters.IntervalBetweenTakingOff),
+                return GetEmptyWindow(new Moment(bundle.LastMoment.Value + AircraftMotionParameters.LandingInterval),
                     new Moment(ModellingParameters.ModellingTime - AircraftMotionParameters.IntervalBetweenTakingOff));
             }
             else if (orderedLandingBundles.Count > bundleIndex + 1)
             {
                 var rightBundle = orderedLandingBundles[bundleIndex + 1];
-                return GetEmptyWindow(new Moment(bundle.LastMoment.Value + AircraftMotionParameters.IntervalBetweenTakingOff),
-                    new Moment(rightBundle.FirstMoment.Value - AircraftMotionParameters.IntervalBetweenTakingOff));
+                return GetEmptyWindow(new Moment(bundle.LastMoment.Value + AircraftMotionParameters.LandingInterval),
+                    new Moment(rightBundle.FirstMoment.Value - AircraftMotionParameters.TakingOffInterval));
             }
 
             return new Interval(new Moment(0), new Moment(0));
         }
 
-        public IInterval GetCentralWindow(IAircraftBundle takingOffBundle, IntersectionCases intersectionCase, List<IAircraftBundle> orderedLandingBundles, int intersectedBundleIndex)
+        public IInterval GetCentralWindow(IAircraftBundle takingOffBundle, IntersectionCases intersectionCase, 
+            List<IAircraftBundle> orderedLandingBundles, int intersectedBundleIndex)
         {
             if (intersectionCase == IntersectionCases.Right)
                 return GetEmptyWindow(new Moment(orderedLandingBundles[intersectedBundleIndex - 1].
-                    LastMoment.Value + AircraftMotionParameters.IntervalBetweenTakingOff),
+                    LastMoment.Value + AircraftMotionParameters.LandingInterval),
                     new Moment(takingOffBundle.FirstMoment.Value - AircraftMotionParameters.IntervalBetweenTakingOff));
             if (intersectionCase == IntersectionCases.Left)
                 return GetEmptyWindow(new Moment(takingOffBundle.LastMoment.Value +
                     AircraftMotionParameters.IntervalBetweenTakingOff),
                     new Moment(orderedLandingBundles[intersectedBundleIndex + 1].
-                    FirstMoment.Value - AircraftMotionParameters.IntervalBetweenTakingOff));
-            return null;
+                    FirstMoment.Value - AircraftMotionParameters.TakingOffInterval));
+
+            return new Interval(new Moment(0), new Moment(0));
         }
 
         public IInterval GetEmptyWindow(IMoment firstMoment, IMoment secondMoment)
