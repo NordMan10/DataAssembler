@@ -37,7 +37,7 @@ namespace OptimalMotion2.Domain
         }
 
         /// <summary>
-        /// Обработка события изменения {Стадии выполнения}: (6)
+        /// Обработка события изменения {Стадии выполнения}:
         /// </summary>
         /// <param name="stage"></param>
         public void ChangeStage(ModelStages stage)
