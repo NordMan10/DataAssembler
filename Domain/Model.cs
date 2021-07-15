@@ -334,7 +334,7 @@ namespace OptimalMotion2.Domain
             return outerAircrafts;
         }
 
-        // comment (main) to merge conflict
+        // Resolved merge conflict
 
         /// <summary>
         /// Сохраняет устаревшие данные моментов вылета ВС для последующего отображения
