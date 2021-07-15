@@ -310,7 +310,7 @@ namespace OptimalMotion2.Domain
         }
 
         /// <summary>
-        /// Распределяет не вместившиеся ВС по свободным окнам
+        /// Распределяет не вместившиеся ВС по свободным окнам 
         /// </summary>
         /// <param name="window"></param>
         /// <param name="outerAircrafts"></param>
@@ -327,7 +327,7 @@ namespace OptimalMotion2.Domain
                 outerAircrafts.RemoveAt(0);
 
                 aircraftCounter++;
-                // Смещение для ВС относительно первого перемещенного в окне
+                // Смещение для ВС относительно первого перемещенного в окне ()
                 var shift = aircraftCounter * AircraftMotionParameters.IntervalBetweenTakingOff;
                 newTakingOffMoment = new Moment(window.FirstMoment.Value + shift);
             }
