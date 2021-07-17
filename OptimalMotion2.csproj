@@ -163,6 +163,7 @@
     </Compile>
     <None Include="Text\Abbreviations.md" />
     <None Include="Text\reset.md" />
+    <None Include="Text\upstream.md" />
     <None Include="Text\push.md" />
     <None Include="Text\branch.md" />
     <None Include="Text\Questions.md" />
