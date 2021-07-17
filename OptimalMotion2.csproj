@@ -162,6 +162,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Text\Abbreviations.md" />
+    <None Include="Text\branch.md" />
     <None Include="Text\Questions.md" />
     <None Include="Text\Notes.md" />
     <None Include="Text\RealizationIdeas.md" />
